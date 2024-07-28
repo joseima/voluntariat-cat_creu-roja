@@ -1,4 +1,4 @@
-import { Revenue } from './definitions';
+import { Realized } from './definitions';
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
@@ -21,15 +21,15 @@ export const formatDateToLocal = (
   return formatter.format(date);
 };
 
-export const generateYAxis = (revenue: Revenue[]) => {
+export const generateYAxis = (amount: Realized[]) => {
   // Calculate what labels we need to display on the y-axis
   // based on highest record and in 1000s
   const yAxisLabels = [];
-  const highestRecord = Math.max(...revenue.map((month) => month.revenue));
-  const topLabel = Math.ceil(highestRecord / 1000) * 1000;
+  const highestRecord = Math.max(...amount.map((month) => month.amount));
+  const topLabel = Math.ceil(highestRecord / 100) * 100;
 
-  for (let i = topLabel; i >= 0; i -= 1000) {
-    yAxisLabels.push(`$${i / 1000}K`);
+  for (let i = topLabel; i >= 0; i -= 100) {
+    yAxisLabels.push(`${i / 10}`);
   }
 
   return { yAxisLabels, topLabel };

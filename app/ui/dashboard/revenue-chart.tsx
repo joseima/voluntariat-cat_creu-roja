@@ -1,7 +1,7 @@
 import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
-import { lusitana } from '@/app/ui/fonts';
-import { Revenue } from '@/app/lib/definitions';
+import {  montserrat } from '@/app/ui/fonts';
+import { Realized } from '@/app/lib/definitions';
 import { fetchRevenue } from '@/app/lib/data';
 
 // This component is representational only.
@@ -25,8 +25,8 @@ export default async function RevenueChart() {
 
   return (
     <div className="w-full md:col-span-4">
-      <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Recent Revenue
+      <h2 className={`${montserrat.className} mb-4 text-xl md:text-2xl`}>
+        Amount of activities
       </h2>
 
       <div className="rounded-xl bg-gray-50 p-4">
@@ -45,7 +45,7 @@ export default async function RevenueChart() {
               <div
                 className="w-full rounded-md bg-blue-300"
                 style={{
-                  height: `${(chartHeight / topLabel) * month.revenue}px`,
+                  height: `${(chartHeight / topLabel) * month.amount}px`,
                 }}
               ></div>
               <p className="-rotate-90 text-sm text-gray-400 sm:rotate-0">

@@ -16,3 +16,6 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+h2 {
+  color: #b91c1c
+}

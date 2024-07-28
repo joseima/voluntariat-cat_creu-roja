@@ -30,7 +30,7 @@ export default function Page() {
         <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
           <p className={`text-xl text-gray-800 md:text-3xl md:leading-normal`}>
             <strong>Welcome volunteer.</strong></p>
-            <p className={`text-xl text-gray-800 md:text-xl md:leading-normal`}>To the activities manager of the week of the {' '}
+            <p className={`text-xl text-gray-800 md:text-xl md:leading-normal`}>To the weekly activities manager at the {' '}
             <span className="text-red-700">
              Red Cross Reception Center {' '}
             </span>

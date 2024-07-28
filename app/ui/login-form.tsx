@@ -20,10 +20,10 @@ export default function LoginForm() {
     <form action={formAction} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`${montserrat.className} mb-3 text-base`}>
-          Please, login with your volunteer credentials to see the activities
+          Please, login with your voluntier credentials to see the activities
         </h1>
         <ul>
-          <li>Email: <code>user@nextmail.com</code></li>
+          <li>Email: <code>voluntier@creu-roja.cat</code></li>
           <li>Password: <code>123456</code></li>
           </ul>
         <div className="w-full">
