@@ -1,7 +1,7 @@
 <h1>Next.js Managing system of activities for the Creu Roja center in Nou Barris, Barcelona</h1>
 
 
-<a href="https://invoices-dashboard-liart.vercel.app" target="_blank">Vercel deploy here. (Please use responsibly)</a>
+<a href="https://voluntariat-cat-creu-roja.vercel.app/" target="_blank">Vercel deploy here. (Please use responsibly)</a>
 
 What to do":
 
