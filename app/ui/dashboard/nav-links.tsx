@@ -13,10 +13,10 @@ const links = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
   {
     name: 'Activities',
-    href: '/dashboard/invoices',
+    href: '/dashboard/activities',
     icon: DocumentDuplicateIcon,
   },
-  { name: 'Voluntiers', href: '/dashboard/customers', icon: UserGroupIcon },
+  { name: 'Voluntiers', href: '/dashboard/voluntiers', icon: UserGroupIcon },
 ];
 
 export default function NavLinks() {

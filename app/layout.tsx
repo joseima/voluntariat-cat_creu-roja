@@ -11,7 +11,7 @@ export default function RootLayout({
       <body className={`${montserrat.className} antialiased`}>
         {children}
         <footer className='py-10 flex justify-center items-center'>
-          <p>Copyright 2025 - All rights reserved</p>  
+          <p>Copyright 2023 - <b className=' text-red-700 '>Creu Roja Catalunya</b> - All rights reserved</p>  
         </footer>  
       </body>
     </html>

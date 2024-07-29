@@ -1,9 +1,9 @@
 import { sql } from '@vercel/postgres';
 import {
+  ActivitiesTable,
   CustomerField,
   CustomersTableType,
   InvoiceForm,
-  InvoicesTable,
   LatestInvoiceRaw,
   Realized,
 } from './definitions';
@@ -66,7 +66,7 @@ export async function fetchCardData() {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 8;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
@@ -74,28 +74,29 @@ export async function fetchFilteredInvoices(
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const invoices = await sql<InvoicesTable>`
+    const activities = await sql<ActivitiesTable>`
       SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
+        activities.id,
+        activities.title,
+        activities.description,
+        activities.date,
+        activities.status,
+        voluntiers.name,
+        voluntiers.email,
+        voluntiers.image_url
+      FROM activities
+      JOIN voluntiers ON activities.voluntier_id = voluntiers.id
       WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
+        voluntiers.name ILIKE ${`%${query}%`} OR
+        voluntiers.email ILIKE ${`%${query}%`} OR
+        activities.title ILIKE ${`%${query}%`} OR
+        activities.description ILIKE ${`%${query}%`} OR
+        activities.status ILIKE ${`%${query}%`}
+      ORDER BY activities.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
-    return invoices.rows;
+    return activities.rows;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoices.');
@@ -105,14 +106,14 @@ export async function fetchFilteredInvoices(
 export async function fetchInvoicesPages(query: string) {
   try {
     const count = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
+    FROM activities
+    JOIN voluntiers ON activities.voluntier_id = voluntiers.id
     WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
+        voluntiers.name ILIKE ${`%${query}%`} OR
+        voluntiers.email ILIKE ${`%${query}%`} OR
+        activities.title ILIKE ${`%${query}%`} OR
+        activities.description ILIKE ${`%${query}%`} OR
+        activities.status ILIKE ${`%${query}%`}
   `;
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
@@ -123,43 +124,41 @@ export async function fetchInvoicesPages(query: string) {
   }
 }
 
-export async function fetchInvoiceById(id: string) {
+export async function fetchActivityById(id: string) {
+  console.log(id)
   try {
     const data = await sql<InvoiceForm>`
       SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
+        activities.id,
+        activities.voluntier_id,
+        activities.title,
+        activities.description,
+        activities.status
+      FROM activities
+      WHERE activities.id = ${id};
     `;
 
-    const invoice = data.rows.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
-    }));
+    const activity = data.rows;
 
-    return invoice[0];
+    return activity[0];
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    throw new Error('Failed to fetch activity.');
   }
 }
 
-export async function fetchCustomers() {
+export async function fetchVoluntiers() {
   try {
     const data = await sql<CustomerField>`
       SELECT
         id,
         name
-      FROM customers
+      FROM voluntiers
       ORDER BY name ASC
     `;
 
-    const customers = data.rows;
-    return customers;
+    const voluntiers = data.rows;
+    return voluntiers;
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all customers.');
@@ -170,31 +169,22 @@ export async function fetchFilteredCustomers(query: string) {
   try {
     const data = await sql<CustomersTableType>`
 		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
+		  voluntiers.id,
+		  voluntiers.name,
+		  voluntiers.email,
+		  voluntiers.image_url
+		FROM voluntiers
 		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
+		  voluntiers.name ILIKE ${`%${query}%`} OR
+      voluntiers.email ILIKE ${`%${query}%`}
+		GROUP BY voluntiers.id, voluntiers.name, voluntiers.email, voluntiers.image_url
+		ORDER BY voluntiers.name ASC
 	  `;
 
-    const customers = data.rows.map((customer) => ({
-      ...customer,
-      total_pending: formatCurrency(customer.total_pending),
-      total_paid: formatCurrency(customer.total_paid),
-    }));
-
-    return customers;
+    const voluntiers = data.rows
+    return voluntiers;
   } catch (err) {
     console.error('Database Error:', err);
-    throw new Error('Failed to fetch customer table.');
+    throw new Error('Failed to fetch voluntiers table.');
   }
 }

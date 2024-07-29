@@ -5,14 +5,20 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { title } from 'process'
 
 const FormSchema = z.object({
     id: z.string(),
-    customerId: z.string({
-        invalid_type_error: 'Please select a customer.',
+    voluntierId: z.string({
+        invalid_type_error: 'Please select a voluntier.',
       }),
-    amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
-    status: z.enum(['pending','paid'], {
+    title: z.string({
+      invalid_type_error: 'Please add a title.',
+    }),
+    description: z.string({
+      invalid_type_error: 'Please add a description.',
+    }),
+    status: z.enum(['pending','taken'], {
         invalid_type_error: 'Please select an invoice status.',
       }),
     date: z.string()
@@ -27,17 +33,19 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 export type State = {
     errors?: {
-      customerId?: string[];
-      amount?: string[];
+      voluntierId?: string[];
+      title?: string[];
+      description?: string[];
       status?: string[];
     };
     message?: string | null;
   };
 
-export async function createInvoice(prevState: State, formData: FormData) {
+export async function createActivity(prevState: State, formData: FormData) {
     const validatedFields = CreateInvoiceFormSchema.safeParse({
-        customerId: formData.get('customerId'),
-        amount: formData.get('amount'),
+        voluntierId: formData.get('voluntierId'),
+        title: formData.get('title'),
+        description: formData.get('description'),
         status: formData.get('status'),
     })
     if (!validatedFields.success) {
@@ -46,54 +54,51 @@ export async function createInvoice(prevState: State, formData: FormData) {
           message: 'Missing Fields. Failed to Create Invoice.',
         };
       }
-    const { customerId, amount, status } = validatedFields.data;
-    const amountInCents = amount * 100
+    const { voluntierId, title, description, status } = validatedFields.data;
     const [date] = new Date().toISOString().split('T')
 
     try {
-        await sql`INSERT INTO invoices (customer_id, amount, status, date) 
-            VALUES (${customerId}, ${amountInCents}, ${status}, ${date} )`
+        await sql`INSERT INTO activities (voluntier_id, title, description, status, date) 
+            VALUES (${voluntierId}, ${title}, ${description}, ${status}, ${date} )`
     } catch (error) {
         return {
           message: 'Database Error: Failed to Create Invoice.',
         };
       }
 
-
-
-    revalidatePath('/dashboard/invoices')
-    redirect('/dashboard/invoices')
+    revalidatePath('/dashboard/activities')
+    redirect('/dashboard/activities')
 }
 
-export async function updateInvoice(id: string, formData: FormData) {
-    const { customerId, amount, status } = UpdateInvoice.parse({
-      customerId: formData.get('customerId'),
-      amount: formData.get('amount'),
+export async function updateActivity(id: string, formData: FormData) {
+    const { voluntierId, title, description, status } = UpdateInvoice.parse({
+      voluntierId: formData.get('voluntierId'),
+      title: formData.get('title'),
+      description: formData.get('description'),
       status: formData.get('status'),
     });
    
-    const amountInCents = amount * 100;
     try {
         await sql`
-        UPDATE invoices
-        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+        UPDATE activities
+        SET voluntier_id = ${voluntierId}, title = ${title}, description = ${description}, status = ${status}
         WHERE id = ${id}
         `
     } catch (error) {
-        return { message: 'Database Error: Failed to Update Invoice.' };
+        return { message: 'Database Error: Failed to Update activity.' };
     }
    
-    revalidatePath('/dashboard/invoices');
-    redirect('/dashboard/invoices');
+    revalidatePath('/dashboard/activities');
+    redirect('/dashboard/activities');
   }
 
-  export async function deleteInvoice(id: string) {
+  export async function deleteActivity(id: string) {
     try {
-        await sql`DELETE FROM invoices WHERE id = ${id}`
+        await sql`DELETE FROM activities WHERE id = ${id}`
     } catch (error) {
         return {message: 'Database Error: Failed to Delete Invoice.'}
     }
-    revalidatePath('/dashboard/invoices');
+    revalidatePath('/dashboard/activities');
   }
 
   export async function authenticate(

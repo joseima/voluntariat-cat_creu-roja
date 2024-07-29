@@ -47,6 +47,17 @@ export type LatestInvoice = {
 export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
   amount: number;
 };
+export type ActivitiesTable = {
+  id: string;
+  voluntier_id: string;
+  name: string;
+  email: string;
+  image_url: string;
+  title: string;
+  description: number;
+  date: string;
+  status: 'pending' | 'taken';
+};
 
 export type InvoicesTable = {
   id: string;
@@ -64,9 +75,6 @@ export type CustomersTableType = {
   name: string;
   email: string;
   image_url: string;
-  total_invoices: number;
-  total_pending: number;
-  total_paid: number;
 };
 
 export type FormattedCustomersTable = {
@@ -87,6 +95,7 @@ export type CustomerField = {
 export type InvoiceForm = {
   id: string;
   customer_id: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  title: string;
+  description: string;
+  status: 'pending' | 'taken';
 };
